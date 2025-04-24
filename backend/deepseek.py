@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # 从环境变量获取API密钥
-DEEPSEEK_API_KEY = "sk-650434dac25e4a8ba00c2f1076b78aa9"  # 直接使用API密钥
+DEEPSEEK_API_KEY = ""  # 直接使用API密钥
 DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions"
 
 def get_ai_response(message: str, user_preferences: dict = None) -> str:

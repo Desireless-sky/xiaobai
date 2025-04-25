@@ -22,6 +22,8 @@
 1. 克隆项目
 2. 安装后端依赖：
    ```bash
+   conda create --name aigirl python=3.10
+   conda activate aigirl
    pip install -r requirements.txt
    ```
 3. 配置环境变量：

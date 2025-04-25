@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 import os
 from dotenv import load_dotenv
 from datetime import datetime
@@ -34,7 +34,51 @@ class Message(BaseModel):
     content: str
     timestamp: Optional[str] = None
 
+# 历史记录响应模型
+class HistoryResponse(BaseModel):
+    messages: List[dict]
+
 # 路由
+@app.get("/chat/history")
+async def get_chat_history(db: Session = Depends(database.get_db)):
+    try:
+        # 从数据库获取历史消息
+        messages = db.query(models.Message).order_by(models.Message.timestamp).all()
+        history = []
+        
+        for msg in messages:
+            # 添加用户消息
+            history.append({
+                "content": msg.content,
+                "is_user": True,
+                "timestamp": msg.timestamp.isoformat()
+            })
+            
+            # 如果存在AI回复，也添加到历史记录中
+            if msg.response:
+                history.append({
+                    "content": msg.response,
+                    "is_user": False,
+                    "timestamp": msg.timestamp.isoformat()
+                })
+        
+        return {"messages": history}
+    except Exception as e:
+        logger.error(f"获取历史记录时发生错误: {str(e)}")
+        raise HTTPException(status_code=500, detail="获取历史记录失败")
+
+@app.delete("/chat/history")
+async def clear_chat_history(db: Session = Depends(database.get_db)):
+    try:
+        # 删除所有历史消息
+        db.query(models.Message).delete()
+        db.commit()
+        return {"message": "历史记录已清除"}
+    except Exception as e:
+        logger.error(f"清除历史记录时发生错误: {str(e)}")
+        db.rollback()
+        raise HTTPException(status_code=500, detail="清除历史记录失败")
+
 @app.post("/chat/")
 async def send_message(message: Message, db: Session = Depends(database.get_db)):
     try:

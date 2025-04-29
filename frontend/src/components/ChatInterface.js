@@ -95,7 +95,7 @@ const ChatInterface = () => {
       {/* 左侧AI女友照片区域 */}
       <div className="w-2/3 bg-white shadow-lg flex items-center justify-center">
         <img
-          src="/test.gif"
+          src="/aigirl.gif"
           alt="AI女友照片"
           className="w-full h-full object-contain"
         />
